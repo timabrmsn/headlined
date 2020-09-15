@@ -6,7 +6,7 @@
 <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js"></script>
 <script>
     Spruce.store('data', {feed: []});
-    function init() {fetch('https://sample-python-nttxv.ondigitalocean.app/latest')
+    function init() {fetch('https://api.headlined.net/')
         .then(result => result.json())
         .then(result => Spruce.store('data').feed = result)};
 </script>
