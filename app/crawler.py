@@ -25,8 +25,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import sessionmaker
 
-DATABASE_URL = "postgresql://headlined:c1o8mglpfn2fjdjm@db-postgresql-nyc1-headlines-do-user-4175084-0.a.db.ondigitalocean.com:25060/defaultdb?sslmode=require"
-# os.environ["DATABASE_URL"]
+DATABASE_URL = os.environ["DATABASE_URL"]
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
