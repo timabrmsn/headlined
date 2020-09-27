@@ -1,6 +1,7 @@
 import os
 import re
 from datetime import datetime, timedelta
+from collections import namedtuple
 from typing import List, Optional
 
 from fastapi import Depends
@@ -14,7 +15,10 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import sessionmaker
 
-DATABASE_URL = os.environ["DATABASE_URL"]
+from copy import copy
+
+DATABASE_URL = "postgresql://headlined:c1o8mglpfn2fjdjm@db-postgresql-nyc1-headlines-do-user-4175084-0.a.db.ondigitalocean.com:25060/defaultdb?sslmode=require"
+#os.environ["DATABASE_URL"]
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -68,6 +72,10 @@ def _get_latest(db: Session):
         .limit(25).all()
     )
 
+db = SessionLocal()
+class cache:
+    time = datetime.now()
+    data = _get_latest(db)
 
 app = FastAPI()
 
@@ -81,18 +89,24 @@ app.add_middleware(
 
 @app.get("/", response_model=List[Entry])
 def get_latest(db: Session = Depends(get_db)):
-    entries = _get_latest(db)
-    for entry in entries:
+    # if diff := (datetime.now() - cache.time) > timedelta(seconds=60):
+    #     cache.data = _get_latest(db)
+    #     cache.time = datetime.now()
+    #     print(diff)
+    cache.data = _get_latest(db)
+    updated_entries = []
+    for entry_orig in cache.data:
+        entry = copy(entry_orig)
         try:
-            domain = re.search("https?://([^\/]+)", entry.link).groups()[0]
+            domain = re.search(r"https?://([^\/]+)", entry.link).groups()[0]
             entry.pub = domain.split(".")[-2].upper()
             entry.icon = f"https://www.google.com/s2/favicons?sz=128&domain={domain}"
         except ValueError:
             entry.pub = entry.source
             entry.icon = "X"
-        match = re.match(r"[^|]+", entry.author)
-        if match:
+        if match := re.match(r"[^|]+", entry.author):
             entry.author = match.group().replace(" and ", ",").replace("By ", "").split(",")
         else:
             entry.author = [entry.author]
-    return entries
+        updated_entries.append(entry)
+    return updated_entries
