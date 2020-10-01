@@ -52,6 +52,7 @@ def process_entry(entry, tld, source):
         db.add(h)
         db.commit()
     except Exception as e:
+        db.rollback()
         print(e)
         print(entry)
 

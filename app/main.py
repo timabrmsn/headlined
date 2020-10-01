@@ -8,17 +8,15 @@ from fastapi import Depends
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy import create_engine
-from sqlalchemy.dialects import postgresql
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import sessionmaker
 
+from models import Headlines
+
 from copy import copy
 
-DATABASE_URL = "postgresql://headlined:c1o8mglpfn2fjdjm@db-postgresql-nyc1-headlines-do-user-4175084-0.a.db.ondigitalocean.com:25060/defaultdb?sslmode=require"
-#os.environ["DATABASE_URL"]
+DATABASE_URL = os.environ["DATABASE_URL"]
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
