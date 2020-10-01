@@ -39,17 +39,21 @@ def fetch_rss_entries(file="urls.json"):
             tld = tldextract.extract(page.href).registered_domain
             source = page.href
             for entry in page.entries:
-                h = Headlines()
-                h.rss = entry
-                h.rss_id = entry.rss_id
-                h.source = source
-                h.domain = tld
-                try:
-                    db.add(h)
-                    db.commit()
-                except Exception as e:
-                    print(e)
+                yield (entry, tld, source)
 
+
+def process_entry(entry, tld, source):
+    h = Headlines()
+    h.rss = entry
+    h.rss_id = entry.rss_id
+    h.source = source
+    h.domain = tld
+    try:
+        db.add(h)
+        db.commit()
+    except Exception as e:
+        print(e)
+        print(entry)
 
 
 if __name__ == "__main__":
