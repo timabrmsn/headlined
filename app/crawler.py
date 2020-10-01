@@ -40,42 +40,22 @@ def fetch_rss_entries(file="urls.json"):
         feeds = json.load(json_file)
     for site in feeds:
         page = feedparser.parse(site["url"])
-        yield page
+        if page.status < 400:
+            tld = tldextract.extract(page.href).registered_domain
+            source = page.href
+            for entry in page.entries:
+                h = Headlines()
+                h.rss = entry
+                h.rss_id = entry.id
+                h.source = source
+                h.domain = tld
+                try:
+                    db.add(h)
+                    db.commit()
+                except Exception as e:
+                    print(e)
 
-
-def extract_headline_row(entry: feedparser.FeedParserDict):
-    h = Headlines()
-    h.title = entry.title
-    h.link = entry.link
-    h.published_text = getattr(entry, 'published', None)
-    h.published_parsed = datetime.fromtimestamp(mktime(entry.published_parsed), tz=timezone('UTC')) if getattr(entry,
-                                                                                                               "published_parsed",
-                                                                                                               None) else None
-    h.source = getattr(getattr(entry, "title_detail", None), "base", None)
-    h.summary = getattr(entry, 'summary', None)
-    domain = tldextract.extract(entry.link)
-    h.pub = domain.registered_domain
-    h.icon = f"https://www.google.com/s2/favicons?sz=128&domain={domain.registered_domain}"
-    return h
-
-
-def extract_authors_rows(entry: feedparser.FeedParserDict):
-    authors = getattr(entry, 'author')
-    if authors is not None:
-        if match := re.match(r"[^|]+", authors):
-            authors = match.group().replace(" and ", ",").replace("By ", "").split(",")
-            return authors
-        else:
-            return [authors]
-    else:
-        return ["N/A"]
 
 
 if __name__ == "__main__":
-    for site in fetch_rss_entries():
-        for entry in site.entries:
-            row = extract_headline_row(entry)
-            db.add(row)
-            db.flush()
-            db.commit()
-            authors = extract_authors_rows(entry)
+    fetch_rss_entries()
