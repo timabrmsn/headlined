@@ -10,6 +10,6 @@ class Headlines(Base):
 
     id = Column(Integer, primary_key=True)
     rss_id = Column(String, unique=True)
-    rss_json = Column(JSONB)
+    rss = Column(JSONB)
     source = Column(String)
     domain = Column(String)

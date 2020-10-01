@@ -45,7 +45,7 @@ def fetch_rss_entries(file="urls.json"):
 def process_entry(entry, tld, source):
     h = Headlines()
     h.rss = entry
-    h.rss_id = entry.rss_id
+    h.rss_id = entry.id
     h.source = source
     h.domain = tld
     try:
