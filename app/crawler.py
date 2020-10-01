@@ -13,7 +13,7 @@ from pathlib import Path
 from time import mktime, sleep
 from pytz import timezone
 
-from models import Headlines, Authors, Tags, HeadlineAuthors, HeadlineTags
+from models import Headlines
 from pydantic import BaseModel
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
