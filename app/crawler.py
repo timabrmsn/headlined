@@ -8,9 +8,6 @@ sys.path.append(str(root))
 import feedparser
 import tldextract
 import json
-import os
-import re
-import sys
 from datetime import datetime
 from pathlib import Path
 from time import mktime, sleep
@@ -18,19 +15,16 @@ from pytz import timezone
 
 from models import Headlines, Authors, Tags, HeadlineAuthors, HeadlineTags
 from pydantic import BaseModel
-from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy import create_engine
-from sqlalchemy.dialects import postgresql
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import sessionmaker
+
 
 DATABASE_URL = os.environ["DATABASE_URL"]
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-Base = declarative_base()
 
 db = SessionLocal()
 
