@@ -19,7 +19,7 @@ from pydantic import BaseModel
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import sessionmaker
-
+from sqlalchemy.exc import IntegrityError
 
 DATABASE_URL = os.environ["DATABASE_URL"]
 
@@ -50,12 +50,17 @@ def process_entry(entry, tld, source):
     h.domain = tld
     try:
         db.add(h)
+        db.flush()
         db.commit()
-    except Exception as e:
+        print(f"added: {entry.id}, {source}")
+    except IntegrityError as e:
         db.rollback()
-        print(e)
-        print(entry)
+    except Exception as e:
+        print(f"exception: {type(e)}\nentry_id: {entry.id}, source: {source}")
+        db.rollback()
 
 
 if __name__ == "__main__":
-    fetch_rss_entries()
+    for entry in fetch_rss_entries():
+        process_entry(*entry)
+
