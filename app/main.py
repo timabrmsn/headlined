@@ -51,7 +51,7 @@ def _get_latest(db: Session):
     updated = []
     entries = (
         db.query(Headlines)
-        .filter(Headlines.published_parsed >= datetime.now() - timedelta(days=10))
+        .filter(Headlines.rss["published_parsed"] >= datetime.now() - timedelta(days=10))
         .limit(25).all()
     )
     for entry in entries:
