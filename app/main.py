@@ -21,8 +21,6 @@ DATABASE_URL = os.environ["DATABASE_URL"]
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-Base = declarative_base()
-
 
 def get_db():
     db = SessionLocal()
@@ -53,7 +51,7 @@ def _get_latest(db: Session):
     updated = []
     entries = (
         db.query(Headlines)
-        .filter(RSSEntry.published_parsed >= datetime.now() - timedelta(days=10))
+        .filter(Headlines.published_parsed >= datetime.now() - timedelta(days=10))
         .limit(25).all()
     )
     for entry in entries:
