@@ -32,20 +32,6 @@ def get_db():
         db.close()
 
 
-class RSSEntry(Base):
-    __tablename__ = "homepage_rssentry"
-
-    id = Column(Integer, primary_key=True)
-    title = Column(String)
-    link = Column(String)
-    published = Column(String)
-    published_parsed = Column(DateTime)
-    summary = Column(String)
-    tags = Column("tags", postgresql.ARRAY(String))
-    author = Column(String)
-    source = Column(String)
-
-
 class Entry(BaseModel):
     id: int
     title: str
@@ -64,16 +50,24 @@ class Entry(BaseModel):
 
 
 def _get_latest(db: Session):
-    return (
-        db.query(RSSEntry)
+    updated = []
+    entries = (
+        db.query(Headlines)
         .filter(RSSEntry.published_parsed >= datetime.now() - timedelta(days=10))
         .limit(25).all()
     )
+    for entry in entries:
+        e = Entry(**entry.rss)
+        e.pub = entry.domain
+        e.source = entry.source
+        e.icon = f"https://www.google.com/s2/favicons?sz=128&domain={entry.domain}"
+        updated.append(e)
+    return updated
 
-db = SessionLocal()
+
 class cache:
     time = datetime.now()
-    data = _get_latest(db)
+    data = _get_latest(SessionLocal())
 
 app = FastAPI()
 
@@ -87,24 +81,7 @@ app.add_middleware(
 
 @app.get("/", response_model=List[Entry])
 def get_latest(db: Session = Depends(get_db)):
-    # if diff := (datetime.now() - cache.time) > timedelta(seconds=60):
-    #     cache.data = _get_latest(db)
-    #     cache.time = datetime.now()
-    #     print(diff)
-    cache.data = _get_latest(db)
-    updated_entries = []
-    for entry_orig in cache.data:
-        entry = copy(entry_orig)
-        try:
-            domain = re.search(r"https?://([^\/]+)", entry.link).groups()[0]
-            entry.pub = domain.split(".")[-2].upper()
-            entry.icon = f"https://www.google.com/s2/favicons?sz=128&domain={domain}"
-        except ValueError:
-            entry.pub = entry.source
-            entry.icon = "X"
-        if match := re.match(r"[^|]+", entry.author):
-            entry.author = match.group().replace(" and ", ",").replace("By ", "").split(",")
-        else:
-            entry.author = [entry.author]
-        updated_entries.append(entry)
-    return updated_entries
+    if diff := (datetime.now() - cache.time) > timedelta(seconds=60):
+        cache.data = _get_latest(db)
+        cache.time = datetime.now()
+    return cache.data
