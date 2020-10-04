@@ -9,6 +9,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sqlalchemy import create_engine
+from sqlalchemy.types import DateTime
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import sessionmaker
 
@@ -51,7 +52,7 @@ def _get_latest(db: Session):
     updated = []
     entries = (
         db.query(Headlines)
-        .filter(Headlines.rss["published_parsed"] >= datetime.now() - timedelta(days=10))
+        .filter(Headlines.rss["published"].astext.cast(DateTime(timezone=True)) >= datetime.utcnow() - timedelta(days=10))
         .limit(25).all()
     )
     for entry in entries:
