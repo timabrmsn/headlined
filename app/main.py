@@ -52,7 +52,11 @@ def _get_latest(db: Session):
     updated = []
     entries = (
         db.query(Headlines)
-        .filter(Headlines.rss["published"].astext.cast(DateTime(timezone=True)) >= datetime.utcnow() - timedelta(days=10))
+        .filter(
+            Headlines.rss["published"]
+            .astext
+            .cast(DateTime(timezone=True)) >= datetime.utcnow() - timedelta(days=10)
+            )
         .limit(25).all()
     )
     for entry in entries:
