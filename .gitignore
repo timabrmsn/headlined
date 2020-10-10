@@ -7,6 +7,7 @@ __pycache__/
 *.so
 
 # Distribution / packaging
+pythonenv3.8/
 .Python
 build/
 develop-eggs/
