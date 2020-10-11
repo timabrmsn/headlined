@@ -76,7 +76,7 @@ class Headlines(Base):
         if tags := getattr(rss, "tags", None):
             tag_list = []
             for tag in tags:
-                if t := db.query(Tags).filter(Tags.term==tag["term"]).first():
+                if t := db.query(Tags).filter(Tags.term == tag["term"]).first():
                     pass
                 else:
                     t = Tags(term=tag["term"])

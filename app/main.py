@@ -1,21 +1,20 @@
-import os
-import re
 import logging
+import os
 from datetime import datetime, timedelta
-from collections import namedtuple
-from typing import List, Optional
+from typing import List
 
 from fastapi import Depends
 from fastapi import FastAPI
 from fastapi import Request
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from models import Headlines
+from models import Authors
+from models import Tags
+from models import Entry
+from models import Base
 from sqlalchemy import create_engine
-from sqlalchemy.types import DateTime
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import sessionmaker
-
-from models import Headlines, Authors, Tags, Entry, Base
 
 DATABASE_URL = os.environ["DATABASE_URL"]
 
@@ -33,8 +32,8 @@ def get_db():
 
 
 def _get_latest(db: Session):
-    results = db.query(Headlines, Authors, Tags)
-        .filter(Headlines.published_parsed >= datetime.utcnow() - timedelta(days=10))
+    results = db.query(Headlines, Authors, Tags)\
+        .filter(Headlines.published_parsed >= datetime.utcnow() - timedelta(days=10))\
         .limit(25).all()
     return [e.Headlines for e in results]
 
