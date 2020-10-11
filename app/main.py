@@ -55,4 +55,5 @@ def get_latest(db: Session = Depends(get_db)):
     if diff := (datetime.now() - cache.time) > timedelta(seconds=60):
         cache.data = _get_latest(db)
         cache.time = datetime.now()
+    print(cache.data)
     return cache.data
