@@ -33,10 +33,10 @@ def get_db():
 
 
 def _get_latest(db: Session):
-    return db.query(Headlines, Authors, Tags)
+    results = db.query(Headlines, Authors, Tags)
         .filter(Headlines.published_parsed >= datetime.utcnow() - timedelta(days=10))
         .limit(25).all()
-
+    return [e.Headlines for e in results]
 
 class cache:
     time = datetime.now()
