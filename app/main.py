@@ -1,11 +1,13 @@
 import os
 import re
+import logging
 from datetime import datetime, timedelta
 from collections import namedtuple
 from typing import List, Optional
 
 from fastapi import Depends
 from fastapi import FastAPI
+from fastapi import Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sqlalchemy import create_engine
@@ -40,7 +42,10 @@ class cache:
     time = datetime.now()
     data = _get_latest(SessionLocal())
 
+logger = logging.getLogger(__name__)
+
 app = FastAPI()
+app.logger = logger
 
 app.add_middleware(
     CORSMiddleware,
@@ -51,9 +56,9 @@ app.add_middleware(
 )
 
 @app.get("/", response_model=List[Entry])
-def get_latest(db: Session = Depends(get_db)):
+def get_latest(request: Request, db: Session = Depends(get_db)):
     if diff := (datetime.now() - cache.time) > timedelta(seconds=60):
         cache.data = _get_latest(db)
         cache.time = datetime.now()
-    print(cache.data)
+    request.app.logger.info(cache.data)
     return cache.data
