@@ -32,10 +32,9 @@ def get_db():
 
 
 def _get_latest(db: Session):
-    results = db.query(Headlines)\
+    return db.query(Headlines)\
         .filter(Headlines.published_parsed >= datetime.utcnow() - timedelta(days=10))\
         .limit(25).all()
-    return [e.Headlines for e in results]
 
 class cache:
     time = datetime.now()
@@ -53,6 +52,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
 
 @app.get("/", response_model=List[Entry])
 def get_latest(request: Request, db: Session = Depends(get_db)):
