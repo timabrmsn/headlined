@@ -32,7 +32,7 @@ def get_db():
 
 
 def _get_latest(db: Session):
-    results = db.query(Headlines, Authors, Tags)\
+    results = db.query(Headlines)\
         .filter(Headlines.published_parsed >= datetime.utcnow() - timedelta(days=10))\
         .limit(25).all()
     return [e.Headlines for e in results]
