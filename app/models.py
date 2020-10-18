@@ -54,8 +54,8 @@ class Headlines(Base):
     published = Column(String)
     published_parsed = Column(DateTime)
     summary = Column(String)
-    authors = relationship("Authors", secondary=author_association_table)
-    tags = relationship("Tags", secondary=tag_association_table)
+    authors = relationship("Authors", lazy='joined', secondary=author_association_table)
+    tags = relationship("Tags", lazy='joined', secondary=tag_association_table)
 
     def __init__(self, rss, db):
         self.rss_id = rss.id
