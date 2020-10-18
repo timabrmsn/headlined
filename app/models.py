@@ -1,19 +1,16 @@
+import os
 from datetime import datetime
 from time import mktime
-import re
-import pytz
-import tldextract
-from sqlalchemy import Column, Integer, String, DateTime, Table, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import relationship
-from pydantic import BaseModel
 from typing import List, Optional
 
-import os
+import pytz
+import tldextract
+from pydantic import BaseModel
+from sqlalchemy import Column, Integer, String, DateTime, Table, ForeignKey
 from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
 from sqlalchemy.orm import sessionmaker, scoped_session
 
 DATABASE_URL = os.environ["DATABASE_URL"]
@@ -22,20 +19,27 @@ engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 db = SessionLocal()
 
+
 class SessionBase:
     query = scoped_session(SessionLocal).query_property()
 
+
 Base = declarative_base(cls=SessionBase)
 
-tag_association_table = Table("tag_association", Base.metadata,
+tag_association_table = Table(
+    "tag_association",
+    Base.metadata,
     Column("headline_id", Integer, ForeignKey("headlines.headline_id")),
     Column("tag_id", Integer, ForeignKey("tags.tag_id"))
 )
 
-author_association_table = Table("author_association", Base.metadata,
+author_association_table = Table(
+    "author_association",
+    Base.metadata,
     Column("headline_id", Integer, ForeignKey("headlines.headline_id")),
     Column("author_id", Integer, ForeignKey("authors.author_id"))
 )
+
 
 class Headlines(Base):
     __tablename__ = "headlines"
@@ -67,7 +71,7 @@ class Headlines(Base):
             authors = authors.replace(" and ", ",").replace("By ", "").split(",")
             author_list = []
             for author in authors:
-                if a := db.query(Authors).filter(Authors.name==author).first():
+                if a := db.query(Authors).filter(Authors.name == author).first():
                     pass
                 else:
                     a = Authors(name=author)
@@ -100,11 +104,13 @@ class Authors(Base):
     author_id = Column(Integer, primary_key=True, nullable=False)
     name = Column(String, unique=True)
 
+
 class Tags(Base):
     __tablename__ = "tags"
 
     tag_id = Column(Integer, primary_key=True, nullable=False)
     term = Column(String, unique=True)
+
 
 class Author(BaseModel):
     name: str
@@ -112,11 +118,13 @@ class Author(BaseModel):
     class Config:
         orm_mode = True
 
+
 class Tag(BaseModel):
     term: str
 
     class Config:
         orm_mode = True
+
 
 class Entry(BaseModel):
     title: str

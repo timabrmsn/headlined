@@ -22,6 +22,7 @@ engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base.metadata.create_all(engine)
 
+
 def get_db():
     db = SessionLocal()
     try:
@@ -30,15 +31,16 @@ def get_db():
         db.close()
 
 
-
 def _get_latest(db: Session):
     return db.query(Headlines)\
         .filter(Headlines.published_parsed >= datetime.utcnow() - timedelta(days=10))\
         .limit(25).all()
 
+
 class cache:
     time = datetime.now()
     data = _get_latest(SessionLocal())
+
 
 logger = logging.getLogger(__name__)
 
