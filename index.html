@@ -7,7 +7,7 @@
 <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js"></script>
 <script>
     Spruce.store('data', {feed: []});
-    function init() {fetch('https://api.headlined.net/')
+    function init() {fetch('https://api.headlined.net/api')
         .then(result => result.json())
         .then(result => Spruce.store('data').feed = result)};
 </script>
@@ -65,14 +65,12 @@
                                                   <img class="h-6 w-6 rounded-full" x-bind:src="entry.icon" alt="" />
                                               </div>
                                               <div class="ml-4">
-                                                  <span class="flex-shrink text-sm leading-5 font-medium text-gray-900" x-text="entry.pub"></span>
-                                                  <span class="text-sm leading-5 font-sm text-gray-500">   |   by:</span>
+                                                  <span class="flex-shrink text-sm leading-5 font-medium text-gray-900" x-text="entry.domain"></span>
+                                                  <span class="flex-shrink text-sm leading-5 text-gray-500" x-text="entry.title"></span>
                                                   <div>
-                                                      <template x-for="author in entry.author">
-                                                          <span class="px-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800" x-text="author"></span>
-                                                      </template>
+                                                  <span class="text-sm leading-5 font-sm text-gray-500">by:</span>
+                                                  <span class="px-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800" x-text="Array.prototype.map.call(entry.authors, s => s.name).toString();"></span>
                                                   </div>
-                                                  <div class="flex-shrink text-sm leading-5 text-gray-500" x-text="entry.title"></div>
                                               </div>
                                           </div>
                                       </td>
