@@ -34,7 +34,8 @@ def get_db():
 def _get_latest(db: Session):
     return db.query(Headlines)\
         .filter(Headlines.published_parsed >= datetime.utcnow() - timedelta(days=10))\
-        .limit(25).all()
+        .order_by(Headlines.published_parsed.desc())\
+        .limit(50).all()
 
 
 class cache:
