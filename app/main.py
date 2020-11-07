@@ -7,6 +7,7 @@ from fastapi import Depends
 from fastapi import FastAPI
 from fastapi import Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.templating import Jinja2Templates
 from models import Headlines
 from models import Authors
 from models import Tags
@@ -55,7 +56,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
+templates = Jinja2Templates(directory="templates")
 
 @app.get("/", response_model=List[Entry])
 def get_latest(request: Request, db: Session = Depends(get_db)):
@@ -63,4 +64,4 @@ def get_latest(request: Request, db: Session = Depends(get_db)):
         cache.data = _get_latest(db)
         cache.time = datetime.now()
     request.app.logger.info(cache.data)
-    return cache.data
+    return templates.TemplateResponse("index.html", {"data": cache.data})

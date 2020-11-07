@@ -1,0 +1,12 @@
+<html>
+<head>
+    <title>Item Details</title>
+</head>
+<body>
+    <ul>
+        {% for entry in data %}
+          <li><a href="{{ entry.link }}">{{ entry.title }}</a></li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
