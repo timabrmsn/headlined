@@ -1,26 +1,19 @@
-import os
+#!/usr/bin/env python3
 import sys
+from itertools import count
 from pathlib import Path
+from time import sleep
 
 file = Path(__file__).resolve()
 parent, root = file.parent, file.parents[1]
 sys.path.append(str(root))
 
 import feedparser
-import tldextract
 import json
-from datetime import datetime
-from pathlib import Path
-from time import mktime, sleep
-from pytz import timezone
 
-from models import db, Base, Headlines
-from pydantic import BaseModel
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.exc import IntegrityError
+from models import db, Headlines
 
+processed_ids = set()
 
 def fetch_rss_entries(file="urls.json"):
     with open(file, "r") as json_file:
@@ -29,11 +22,19 @@ def fetch_rss_entries(file="urls.json"):
         page = feedparser.parse(site["url"])
         if page.status < 400:
             for entry in page.entries:
+                if entry.id in processed_ids:
+                    print(f"{entry.id} already processed.")
+                    continue
+                processed_ids.add(entry.id)
                 entry.source = page.href
                 yield entry
 
 
 if __name__ == "__main__":
-    for entry in fetch_rss_entries():
-        h = Headlines(entry, db)
+    while True:
+        for i in count(1):
+            for entry in fetch_rss_entries():
+                h = Headlines(entry, db)
+            print(f"Run {i} complete.")
+            sleep(60)
 

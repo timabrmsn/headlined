@@ -1,0 +1,36 @@
+databases:
+- engine: PG
+  name: db
+  num_nodes: 1
+  size: db-s-dev-database
+  version: "12"
+name: headlined
+region: nyc
+services:
+- dockerfile_path: Dockerfile
+  envs:
+  - key: DATABASE_URL
+    scope: RUN_TIME
+    value: ${db.DATABASE_URL}
+  github:
+    branch: master
+    deploy_on_push: true
+    repo: timabrmsn/headlined
+  http_port: 8080
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  name: headlined
+  routes:
+  - path: /
+static_sites:
+  - name: home
+    github:
+      branch: master
+      deploy_on_push: true
+      repo: timabrmsn/headlined
+    source_dir: /
+    index_document: index.html
+    error_document: 404.html
+    routes:
+      - path: /home
+
