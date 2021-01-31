@@ -1,4 +1,5 @@
 fastapi~=0.60.1
+fastapi_utils
 feedparser~=6.0.1
 tldextract~=2.2.3
 psycopg2-binary~=2.8.6

@@ -97,6 +97,12 @@ class Headlines(Base):
         finally:
             db.rollback()
 
+    def __eq__(self, other):
+        return self.headline_id == other.headline_id
+
+    def __repr__(self):
+        return self.title
+
 
 class Authors(Base):
     __tablename__ = "authors"
