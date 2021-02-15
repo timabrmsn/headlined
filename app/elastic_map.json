@@ -1,0 +1,44 @@
+{
+  "mappings": {
+    "properties": {
+      "site": {
+        "type": "keyword",
+        "index": "true"
+      },
+      "source_link": {
+        "type": "keyword"
+      },
+      "title": {
+        "type": "text",
+        "index": "true"
+      },
+      "link": {
+        "type": "keyword"
+      },
+      "domain": {
+        "type": "keyword",
+        "index": "true"
+      },
+      "authors": {
+        "type": "text",
+        "index": "true"
+      },
+      "publisher": {
+        "type": "keyword",
+        "index": "true"
+      },
+      "published": {
+        "type": "date",
+        "index": "true"
+      },
+      "summary": {
+        "type": "text",
+        "index": "true"
+      },
+      "tags": {
+        "type": "keyword",
+        "index": "true"
+      }
+    }
+  }
+}
